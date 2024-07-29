@@ -39,9 +39,9 @@ public class QnaService {
 				 .findByAuthor(author)
 				 .stream()
 				 .findFirst().orElse(null); // 단일 질문 반환
-	     
 	};
-	
+
+	// 현재 인증된 사용자 정보 가져오기
 	private String getCurrentUsername() {
 	    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	    if (principal instanceof UserDetails) {
@@ -88,6 +88,13 @@ public class QnaService {
     @Transactional
     public Question deleteQuestion(Long id) {
         Question question = questionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Question not found"));
+        //해당 질문과 연결된 모든 답변부터 삭제
+        Answer answer = answerRepository.findByQuestion(question);
+        if (answer != null) {
+            answerRepository.delete(answer);
+        }
+        
+        //질문 삭제
         questionRepository.delete(question);
         return question;
     }
@@ -98,6 +105,17 @@ public class QnaService {
     	return questionRepository.findByAuthor(author);
     }
     
+    public Question getQuestionById(Long id) {
+    	Question question = questionRepository.findById(id)
+    	        .orElseThrow(() -> new EntityNotFoundException("Question not found"));
+		return question;
+    }
+    
+    public Answer getAnswerByQuestionId(Long question_id) {
+    	Question question = questionRepository.findById(question_id)
+    			.orElseThrow(() -> new EntityNotFoundException("Question not found"));
+    	return answerRepository.findByQuestion(question);
+    }
 //    @Transactional
 //    public void markQuestionAsAnswered(String username) {
 //        Member author = memberRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -122,4 +140,6 @@ public class QnaService {
 //			throw new EntityNotFoundException("답변을 찾을 수 없습니다.");
 //		}
 //	}
+
+
 }

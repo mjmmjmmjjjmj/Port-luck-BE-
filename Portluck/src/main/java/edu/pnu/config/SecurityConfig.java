@@ -38,21 +38,21 @@ public class SecurityConfig {
 		
 //		http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/signUp", "/searchPW", "/login").permitAll(); 
+            auth.requestMatchers("/signUp", "/login", "/changePW", "/temPW").permitAll(); 
             // 회원가입, 비밀번호 찾기, 로그인은 모든 사람 ok
 //            auth.requestMatchers(HttpMethod.POST, "/qna/questions/**").permitAll(); //postman 테스트용 
-            auth.requestMatchers(HttpMethod.GET, "/waitingTime", "/qna/**", "/qna/answers/**", "/qna/myQuestions").hasRole("USER"); 
+            auth.requestMatchers(HttpMethod.GET, "/waitingTime", "/qna/**", "/qna/answers/**", "/qna/myQuestions", "/qna/questions/{question_id}", "/qna/answers/{question_id}").hasAnyRole("ADMIN", "USER"); 
             // 가입한 유저 기능, 질문보기, 답변 보기 ok
-            auth.requestMatchers(HttpMethod.POST, "/qna/questions/**").hasAnyRole("USER", "ADMIN"); 
+            auth.requestMatchers(HttpMethod.POST, "/qna/questions/**", "/qna/questions/{question_id}").hasAnyRole("USER", "ADMIN"); 
             // 가입한 유저 질문 ok
-            auth.requestMatchers(HttpMethod.GET, "/qna/**").hasAnyRole("ADMIN"); 
+            auth.requestMatchers(HttpMethod.GET, "/qna", "/qna/questions/{question_id}").hasRole("ADMIN"); 
             // 관리자 답변보기 ok
 //            auth.requestMatchers(HttpMethod.GET,  "/qna/**").permitAll(); //postman 테스트용
             auth.requestMatchers(HttpMethod.POST, "/qna/answers/**").hasRole("ADMIN"); 
             // 관리자 답변하기 ok
 //            auth.requestMatchers(HttpMethod.POST, "/qna/answers/**").permitAll(); //postman 테스트용 
             // 관리자 답변하기 ok
-			auth.requestMatchers(HttpMethod.DELETE, "/qna/questions/**").hasRole("ADMIN");
+			auth.requestMatchers(HttpMethod.DELETE, "/qna/questions", "/qna/questions/{question_id}").hasRole("ADMIN");
 //			auth.requestMatchers(HttpMethod.DELETE, "/qna/questions/**").permitAll();
 			// 관리자 질문 삭제 ok
             auth.anyRequest().authenticated();

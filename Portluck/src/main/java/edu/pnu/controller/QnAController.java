@@ -41,7 +41,24 @@ public class QnAController {
 		return qnaService.createQuestion(question);
 	}
 	
-	////admin만 됨
+	// admin만 됨	
+	@DeleteMapping("/questions/{question_id}")
+	public ResponseEntity<String> deleteQuestion(@PathVariable("question_id") Long id) {
+		Question deletedQuestion = qnaService.deleteQuestion(id);
+		return ResponseEntity.ok("질문이 성공적으로 삭제되었습니다.");
+	}
+
+	@GetMapping("/myQuestions")
+	public List<Question> getMyQuestions() {
+		return qnaService.getMyQuestions();
+	}
+
+    @GetMapping("/questions/{question_id}")
+    public Question getQuestionById(@PathVariable("question_id") Long id) {
+        return qnaService.getQuestionById(id);
+    }
+    //-------------------/	
+    ////admin만 됨
 	@PostMapping("/answers")
 	public Answer createAnswer(@RequestBody Answer answer) {
 		Answer createdAnswer = qnaService.createAnswer(answer);
@@ -53,26 +70,20 @@ public class QnAController {
 	public List<Answer> getAllAnswers() {
 		return qnaService.getAllAnswers();
 	}
-	
+
+    @GetMapping("/answers/question/{question_id}")
+    public Answer getAnswerByQuestionId(@PathVariable("question_id") Long question_id) {
+        return qnaService.getAnswerByQuestionId(question_id);
+    }
+    
 	@GetMapping("/answers/{username}")
 	public Answer getAnswerByUsername(@PathVariable String username) {
 		return qnaService.getAnswerByUsername(username);
 	}
 	
-// admin만 됨	
-	@DeleteMapping("/questions/{username}")
-	public ResponseEntity<String> deleteQuestion(@PathVariable Long id) {
-		Question deletedQuestion = qnaService.deleteQuestion(id);
-		return ResponseEntity.ok("질문이 성공적으로 삭제되었습니다.");
-	}
 
-	@GetMapping("/myQuestions")
-	public List<Question> getMyQuestions() {
-		return qnaService.getMyQuestions();
-	}
-//	@GetMapping("/qna/{question_id}")
-//	public Question
-	
+
+    
 //	//admin만 됨
 //	@PutMapping("/qna/answers")
 //	public Answer fixAnswer(@RequestBody Answer answer) {

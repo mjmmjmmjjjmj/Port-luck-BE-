@@ -8,7 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +25,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "member", indexes = @Index(columnList = "email"))
 public class Member {
 	@Id
 	private String username;
@@ -42,4 +45,7 @@ public class Member {
     @JsonManagedReference("member-answers")
 	private List<Answer> answers;
 
+	public void setEmail(String email) {
+		this.email = email.toLowerCase();
+	}
 }

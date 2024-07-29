@@ -16,8 +16,8 @@ public class MemberService {
 	@Autowired
 	private MemberRepository memberRepository;
 	
-	@Autowired
-	private EmailService emailService;
+//	@Autowired
+//	private EmailService emailService;
 	
 	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
@@ -42,29 +42,53 @@ public class MemberService {
 			return false;
 		}
 	}
-	
-	public boolean sendPasswordResetLink(String email) {
-		Optional<Member> memberOpt = memberRepository.findByEmail(email);
-		if (memberOpt.isPresent()) {
-			Member member = memberOpt.get();
-			String resetToken = UUID.randomUUID().toString();
-			String resetLink = "http://your-application.com/reset-password?token="+resetToken;
-			emailService.sendSimpleMessage(email, "비밀번호 재설정 요청", "비밀번호 재설정은 링크를 눌러주세요"+resetLink);
-			member.setResetToken(resetToken);
-			memberRepository.save(member);
-			return true;
-		}
-		return false;
+
+//    public boolean sendTemporaryPassword(String email) {
+//        email = email.trim().toLowerCase();
+//        Optional<Member> memberOpt = memberRepository.findByEmail(email);
+//        if (memberOpt.isPresent()) {
+//            Member member = memberOpt.get();
+//            String tempPassword = generateRandomPassword();
+//            member.setPassword(passwordEncoder.encode(tempPassword));
+//            memberRepository.save(member);
+//            emailService.sendSimpleMessage(email, "임시 비밀번호 발송", "임시 비밀번호는: " + tempPassword + "입니다.");
+//            return true;
+//        } else {
+//            System.out.println("해당 이메일(" + email + ")을 찾을 수 없습니다.");
+//            return false;
+//        }
+//    }
+
+    public String generateTemporaryPassword(String email) {
+        email = email.trim().toLowerCase();
+        Optional<Member> memberOpt = memberRepository.findByEmail(email);
+        if (memberOpt.isPresent()) {
+            Member member = memberOpt.get();
+            String tempPassword = generateRandomPassword();
+            member.setPassword(passwordEncoder.encode(tempPassword));
+            memberRepository.save(member);
+            // 로그에 출력
+            System.out.println("임시 비밀번호: " + tempPassword);
+            return tempPassword;
+        } else {
+            System.out.println("해당 이메일(" + email + ")을 찾을 수 없습니다.");
+            return null;
+        }
+    }
+	private String generateRandomPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
 	}
-	
-	public boolean resetPassword(String token, String newPassword) {
-		Optional<Member> memberOpt = memberRepository.findByResetToken(token);
+
+	public boolean changePassword(String username, String oldPassword, String newPassword) {
+		// TODO Auto-generated method stub
+		Optional<Member> memberOpt = memberRepository.findById(username);
 		if(memberOpt.isPresent()) {
 			Member member = memberOpt.get();
-			member.setPassword(passwordEncoder.encode(newPassword));
-			member.setResetToken(null); //토큰 쓰고 나면 없앰
-			memberRepository.save(member);
-			return true;
+			if (passwordEncoder.matches(oldPassword, member.getPassword())) {
+				member.setPassword(passwordEncoder.encode(newPassword));
+				memberRepository.save(member);
+				return true;
+			}
 		}
 		return false;
 	}

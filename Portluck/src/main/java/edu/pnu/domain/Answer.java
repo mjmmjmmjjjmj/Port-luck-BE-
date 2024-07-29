@@ -3,6 +3,7 @@ package edu.pnu.domain;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,6 +47,7 @@ public class Answer {
 
 	@Column(name = "answer_date")
 	@Builder.Default
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime answerDate = LocalDateTime.now();
 	
 	@Override
